@@ -11,6 +11,7 @@ f_norm = norm(f);
 tol = 1e-3;
 iter = 1;
 iter_max = 1e3;
+f_values = zeros(iter_max,1);
 
 % Initialization for BFGS
 B = eye(2*N);
@@ -20,8 +21,9 @@ fk = f;
 
 % parameters for backtracking line search
 fail_flag = 0;
-c = 0.75;
+c = 0.3;
 rho = 0.9;
+m = 1;
 
 while f_norm > tol && iter < iter_max
     [~,flag] = chol(B);
@@ -59,6 +61,7 @@ while f_norm > tol && iter < iter_max
     u = U(x,y,A);
     f = forces(x,y,A);
     norm_f = norm(f);
+    f_values(iter) = norm_f;
 
     if mod(iter, 20) == 0
         B = eye(2*N);
@@ -73,15 +76,24 @@ while f_norm > tol && iter < iter_max
     fk = f;
 
     fprintf("iter %d : dir = %s, u = %d, ||grad u|| = %d, step length = %d\n",iter,dir,u,norm_f,a);
-    
+
     if fail_flag == 1
         break;
     end
-
+    
+    m = m + 1;
     iter = iter + 1;
 end
 
-plot_graph(x,y,A)
+figure(1);
+fsz = 20;
+f_d = f_values(1:m);
+f_d = log(f_d);
+plot(f_d,'Linewidth',2);
+xlabel('Iteration #','FontSize',fsz);
+ylabel('Norm of Force in Log Scale','FontSize',fsz);
+
+plot_graph(x,y,A);
 
 end
 

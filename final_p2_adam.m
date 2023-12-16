@@ -9,6 +9,7 @@ w = vertcat(x,y);
 g = -1 * forces(x,y,A);
 tol = 1e-5;
 iter_max = 1e5;
+f_values = zeros(iter_max,1);
 
 % Initialization for Adam
 eta = 0.001;
@@ -28,6 +29,7 @@ for k = 1:iter_max
     u = U(x,y,A);
     g = -1 * forces(x,y,A);
     g_norm = norm(g);
+    f_values(k) = g_norm;
     if mod(k,1e3) == 0
         fprintf('k = %d, u = %d, ||g|| = %d\n',k,u,g_norm);
     end
@@ -35,6 +37,13 @@ for k = 1:iter_max
         break;
     end
 end
+
+figure(1);
+fsz = 20;
+f_d = log(f_values);
+plot(f_d,'Linewidth',2);
+xlabel('Iteration #','FontSize',fsz);
+ylabel('Norm of Force in Log Scale','FontSize',fsz);
 
 plot_graph(x,y,A)
 
